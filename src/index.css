@@ -4,10 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Setup Font Kustom Mukadimah (Tetep disimpan buat opsi judul/logo) */
+/* Setup Font Kustom Mukadimah (Karena di folder public, aksesnya langsung dari root /fonts/) */
 @font-face {
   font-family: 'Mukadimah';
-  src: url('./assets/fonts/mukadimah.ttf') format('truetype');
+  src: url('/fonts/mukadimah.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
