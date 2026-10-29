@@ -2,16 +2,16 @@ import { useEffect } from 'react';
 import { X, User, Heart, Quote, Music } from 'lucide-react';
 import { toSpotifyEmbed, fotoFrameStyle } from '../lib/api';
 
-/**
- * Pop-up modal biodata lengkap anggota — selaras dengan tema member:
- * canvas krem (#E8E2CB), foto PNG cutout transparan yang "berdiri"
- * (tanpa kotak background, kepala/badan proporsional), lalu kartu
- * nama putih menumpuk di bagian bawah foto.
- *
- * Detail yang dipertahankan: Spotify Embed, hobi, role, quotes.
- */
+function getPhotoUrl(foto) {
+  if (!foto) return '/avatars/member-01.svg';
+  if (foto.startsWith('/uploads/')) {
+    const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/api$/, '');
+    return `${baseUrl}${foto}`;
+  }
+  return foto;
+}
+
 export default function MemberModal({ member, onClose }) {
-  // Tutup dengan tombol Esc
   useEffect(() => {
     const handler = (e) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', handler);
@@ -24,8 +24,8 @@ export default function MemberModal({ member, onClose }) {
 
   if (!member) return null;
 
-  // Embed lagu member (fallback ke teks lama jika link belum diisi)
   const spotifyEmbed = toSpotifyEmbed(member.laguSpotify);
+  const fotoUrl = getPhotoUrl(member.foto);
 
   return (
     <div
@@ -39,7 +39,6 @@ export default function MemberModal({ member, onClose }) {
         className="animate-fade-up thin-scrollbar relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border-4 border-slate-900 bg-white shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Tombol tutup */}
         <button
           type="button"
           onClick={onClose}
@@ -51,7 +50,6 @@ export default function MemberModal({ member, onClose }) {
 
         {/* ============ AREA FOTO CUTOUT (canvas krem) ============ */}
         <div className="relative h-80 overflow-hidden border-b-4 border-slate-900 bg-[#E8E2CB] sm:h-96">
-          {/* Pola titik halus biar canvas nggak flat */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 opacity-[0.18]"
@@ -61,15 +59,13 @@ export default function MemberModal({ member, onClose }) {
             }}
           />
 
-          {/* Foto PNG transparan: object-contain + posisi dari adjuster admin */}
           <img
-            src={member.foto}
+            src={fotoUrl}
             alt={member.nama}
             style={fotoFrameStyle(member)}
             className="relative h-full w-full object-contain object-bottom pb-16 drop-shadow-[0_14px_18px_rgba(15,23,42,0.3)]"
           />
 
-          {/* Kartu nama & role menumpuk di bawah foto */}
           <div className="absolute inset-x-4 bottom-4 z-10 rounded-2xl border-2 border-slate-900 bg-white p-4 text-left shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
             <p className="text-2xl font-black leading-tight text-slate-900 sm:text-3xl">
               {member.nama}
@@ -106,7 +102,6 @@ export default function MemberModal({ member, onClose }) {
             </div>
           </div>
 
-          {/* ============ LAGU KESUKAAN (SPOTIFY EMBED) ============ */}
           <div className="flex items-start gap-3.5">
             <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-slate-900 bg-[#1DB954] text-slate-950 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
               <Music size={18} />
